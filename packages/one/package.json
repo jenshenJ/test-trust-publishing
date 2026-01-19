@@ -2,13 +2,13 @@
   "name": "@jenshenj/trusted-publish-a",
   "version": "1.0.1",
   "description": "Test package A for npm Trusted Publishing (OIDC)",
-  "homepage": "https://github.com/jenshenJ/trusted-publish-test#readme",
+  "homepage": "https://github.com/jenshenJ/test-trust-publishing#readme",
   "bugs": {
-    "url": "https://github.com/jenshenJ/trusted-publish-test/issues"
+    "url": "https://github.com/jenshenJ/test-trust-publishing/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jenshenJ/trusted-publish-test.git"
+    "url": "git+https://github.com/jenshenJ/test-trust-publishing.git"
   },
   "license": "ISC",
   "author": "jenshenJ",
