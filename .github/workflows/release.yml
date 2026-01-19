@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**/package.json'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check version changes
+        id: ver
+        run: |
+          PREV=$(git rev-parse HEAD~1 2>/dev/null || echo "")
+          CHANGED=""
+          for pkg in packages/*/package.json; do
+            [ -f "$pkg" ] || continue
+            CUR=$(node -p "require('./$pkg').version")
+            OLD=""
+            if [ -n "$PREV" ]; then
+              OLD=$(git show "$PREV:$pkg" 2>/dev/null | node -p "try{JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version}catch(e){''}" 2>/dev/null || echo "")
+            fi
+            if [ "$CUR" != "$OLD" ]; then
+              NAME=$(node -p "require('./$pkg').name")
+              echo "  $NAME: ${OLD:-'(new)'} -> $CUR"
+              CHANGED="${CHANGED}${pkg}\n"
+            fi
+          done
+          if [ -z "$CHANGED" ]; then
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+            echo "No version changes."
+            exit 0
+          fi
+          echo "should_publish=true" >> $GITHUB_OUTPUT
+          echo "changed<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Publish to npm (OIDC)
+        if: steps.ver.outputs.should_publish == 'true'
+        run: |
+          npm install -g npm@11.5.1
+          echo "Publishing changed packages (OIDC, no NPM_TOKEN)..."
+          echo "${{ steps.ver.outputs.changed }}" | while read -r pkg; do
+            [ -z "$pkg" ] || [ ! -f "$pkg" ] && continue
+            dir=$(dirname "$pkg")
+            name=$(node -p "require('./$pkg').name")
+            ver=$(node -p "require('./$pkg').version")
+            echo "Publishing $name@$ver from $dir"
+            cd "$dir"
+            npm publish --access public --provenance
+            cd ../..
+          done

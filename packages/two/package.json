@@ -1,0 +1,10 @@
+{
+  "name": "@jenshenj/trusted-publish-b",
+  "version": "1.0.0",
+  "description": "Test package B for npm Trusted Publishing (OIDC)",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jenshenJ/trusted-publish-test.git"
+  }
+}
