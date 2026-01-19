@@ -1,6 +1,6 @@
 {
   "name": "@jenshenj/trusted-publish-a",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Test package A for npm Trusted Publishing (OIDC)",
   "homepage": "https://github.com/jenshenJ/test-trust-publishing#readme",
   "bugs": {
