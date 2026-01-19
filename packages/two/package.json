@@ -1,6 +1,6 @@
 {
   "name": "@jenshenj/trusted-publish-b",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Test package B for npm Trusted Publishing (OIDC)",
   "main": "index.js",
   "repository": {
